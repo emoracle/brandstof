@@ -1,0 +1,29 @@
+# Lokale gebruikersinstellingen
+data/settings.json
+
+# Lokale Codex-helper
+resumeCodex.sh
+
+# Lokale projectdocumentatie
+IMPLEMENTATION.md
+spec.md
+instructions.md
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Testdekking
+coverage/
+.nyc_output/
+
+# Omgeving en editors
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

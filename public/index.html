@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hybride Autokosten</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="content-grid">
+        <section class="panel summary-panel">
+          <div class="panel-heading">
+            <h2>Uitkomsten</h2>
+            <p id="summary-distance">De waarden linksboven worden direct herberekend bij elke wijziging.</p>
+          </div>
+          <div class="hero-metrics" id="summary-cards"></div>
+          <p class="cost-per-km" id="cost-per-km"></p>
+        </section>
+
+        <form class="panel form-panel" id="settings-form">
+          <div class="panel-heading">
+            <h2>Invoer</h2>
+            <p>Alle waarden worden bewaard in een JSON-bestand op de server.</p>
+          </div>
+          <div class="field-grid" id="field-grid"></div>
+          <p class="save-state" id="save-state">Bezig met laden...</p>
+        </form>
+      </section>
+
+      <section class="panel breakdown-panel">
+        <div class="panel-heading">
+          <h2>Transparante kostenopbouw</h2>
+          <p>De accu dekt eerst zoveel mogelijk kilometers af.</p>
+        </div>
+        <div class="breakdown-list" id="breakdown-list"></div>
+      </section>
+    </main>
+
+    <template id="field-template">
+      <label class="field">
+        <span class="field-label"></span>
+        <span class="field-hint"></span>
+        <span class="field-control">
+          <input class="field-input" />
+          <span class="field-unit"></span>
+        </span>
+      </label>
+    </template>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

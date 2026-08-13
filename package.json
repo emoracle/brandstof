@@ -1,0 +1,19 @@
+{
+  "name": "brandstof-kosten",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Single-page app voor hybride autokosten met JSON-opslag.",
+  "keywords": [
+    "hybride-auto",
+    "brandstofkosten",
+    "elektriciteitskosten"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test"
+  }
+}
