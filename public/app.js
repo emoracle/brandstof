@@ -122,10 +122,14 @@ function renderFields() {
       saveButton.type = "button";
       saveButton.className = "save-button";
       saveButton.textContent = "Opslaan";
+      saveButton.title = "Sla bovenstaande gegevens op";
+      saveButton.setAttribute("aria-label", "Sla bovenstaande gegevens op");
       saveButton.addEventListener("click", saveSettings);
       restoreButton.type = "button";
       restoreButton.className = "restore-button";
       restoreButton.textContent = "Terug";
+      restoreButton.title = "Haal de laatst opgeslagen gegevens terug";
+      restoreButton.setAttribute("aria-label", "Haal de laatst opgeslagen gegevens terug");
       restoreButton.addEventListener("click", restoreSettings);
       action.append(saveButton, restoreButton);
       fieldGrid.appendChild(action);
