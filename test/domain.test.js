@@ -11,6 +11,7 @@ test("default settings describe the documented starting values", () => {
     pricePerKwh: 0.44,
     pricePerLiter: 2.2,
     chargingFee: 0,
+    chargingFeePercentage: 0,
     kwhPer100Km: 15.5,
     litersPer100Km: 4.7,
     distanceKm: 75,
@@ -23,6 +24,7 @@ test("a trip within battery range is fully electric", () => {
     pricePerKwh: 0.4,
     pricePerLiter: 2,
     chargingFee: 1,
+    chargingFeePercentage: 0,
     kwhPer100Km: 20,
     litersPer100Km: 5,
     distanceKm: 50,
@@ -46,6 +48,7 @@ test("a trip beyond battery range uses fuel for the remainder", () => {
     pricePerKwh: 0.4,
     pricePerLiter: 2,
     chargingFee: 1,
+    chargingFeePercentage: 0,
     kwhPer100Km: 20,
     litersPer100Km: 5,
     distanceKm: 100,
@@ -75,6 +78,22 @@ test("charging fee is not applied without electric distance", () => {
   assert.equal(metrics.electricityCost, 0);
   assert.ok(metrics.fuelCost > 0);
   assert.equal(metrics.totalCost, metrics.fuelCost);
+});
+
+test("percentage charging fee is calculated over base electricity cost", () => {
+  const metrics = calculate({
+    ...DEFAULT_SETTINGS,
+    pricePerKwh: 1,
+    kwhPer100Km: 20,
+    distanceKm: 500,
+    batteryCapacityKwh: 100,
+    chargingFeePercentage: 5
+  });
+
+  assert.equal(metrics.baseElectricityCost, 100);
+  assert.equal(metrics.chargingSurcharge, 5);
+  assert.equal(metrics.electricityCost, 105);
+  assertApproximately(metrics.electricityCostPerKm, 0.21);
 });
 
 test("zero consumption values avoid division by zero", () => {
@@ -108,12 +127,24 @@ test("sanitization clamps negatives and replaces invalid numbers", () => {
   const settings = sanitizeSettings({
     pricePerKwh: -1,
     chargingFee: -10,
+    chargingFeePercentage: 150,
     litersPer100Km: "geen getal",
     distanceKm: Infinity
   });
 
   assert.equal(settings.pricePerKwh, 0);
   assert.equal(settings.chargingFee, 0);
+  assert.equal(settings.chargingFeePercentage, 100);
   assert.equal(settings.litersPer100Km, DEFAULT_SETTINGS.litersPer100Km);
   assert.equal(settings.distanceKm, DEFAULT_SETTINGS.distanceKm);
+});
+
+test("fixed charging fee takes precedence when both fee types are submitted", () => {
+  const settings = sanitizeSettings({
+    chargingFee: 2.5,
+    chargingFeePercentage: 5
+  });
+
+  assert.equal(settings.chargingFee, 2.5);
+  assert.equal(settings.chargingFeePercentage, 0);
 });

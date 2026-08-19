@@ -26,10 +26,19 @@ const fields = [
   {
     key: "chargingFee",
     label: "Instaptarief laden",
-    hint: "Wordt alleen meegenomen als er elektrisch gereden wordt.",
+    hint: "Vast bedrag; zet het percentage automatisch op nul.",
     step: "0.01",
     min: "0",
     unit: "euro"
+  },
+  {
+    key: "chargingFeePercentage",
+    label: "Percentage laadkosten",
+    hint: "Percentage over de elektriciteitskosten; zet het vaste bedrag op nul.",
+    step: "0.1",
+    min: "0",
+    max: "100",
+    unit: "%"
   },
   {
     key: "litersPer100Km",
@@ -103,10 +112,21 @@ function renderFields() {
     input.name = field.key;
     input.step = field.step;
     input.min = field.min;
+    if (field.max) {
+      input.max = field.max;
+    }
     input.value = state.settings[field.key] ?? "";
 
     input.addEventListener("input", () => {
       state.settings[field.key] = Number(input.value);
+      if (state.settings[field.key] > 0 && field.key === "chargingFee") {
+        state.settings.chargingFeePercentage = 0;
+        fieldGrid.querySelector('[name="chargingFeePercentage"]').value = 0;
+      }
+      if (state.settings[field.key] > 0 && field.key === "chargingFeePercentage") {
+        state.settings.chargingFee = 0;
+        fieldGrid.querySelector('[name="chargingFee"]').value = 0;
+      }
       state.hasUnsavedChanges = true;
       renderSaveState();
       refresh();
@@ -145,10 +165,17 @@ function calculate(settings) {
   const fuelDistanceKm = Math.max(settings.distanceKm - electricDistanceKm, 0);
   const electricityUsedKwh = electricDistanceKm * (settings.kwhPer100Km / 100);
   const fuelUsedLiters = fuelDistanceKm * (settings.litersPer100Km / 100);
-  const electricityCostPerKm = (settings.kwhPer100Km / 100) * settings.pricePerKwh;
+  const baseElectricityCost = electricityUsedKwh * settings.pricePerKwh;
+  const chargingSurcharge =
+    electricDistanceKm > 0
+      ? settings.chargingFee > 0
+        ? settings.chargingFee
+        : baseElectricityCost * (settings.chargingFeePercentage / 100)
+      : 0;
+  const electricityCostPerKm =
+    (settings.kwhPer100Km / 100) * settings.pricePerKwh * (1 + settings.chargingFeePercentage / 100);
   const fuelCostPerKm = (settings.litersPer100Km / 100) * settings.pricePerLiter;
-  const electricityCost =
-    electricityUsedKwh * settings.pricePerKwh + (electricDistanceKm > 0 ? settings.chargingFee : 0);
+  const electricityCost = baseElectricityCost + chargingSurcharge;
   const fuelCost = fuelUsedLiters * settings.pricePerLiter;
   const totalCost = electricityCost + fuelCost;
 
@@ -160,6 +187,8 @@ function calculate(settings) {
     fuelDistanceKm,
     electricityUsedKwh,
     fuelUsedLiters,
+    baseElectricityCost,
+    chargingSurcharge,
     electricityCostPerKm,
     fuelCostPerKm,
     electricityCost,
@@ -194,7 +223,10 @@ function renderSummary(metrics) {
 }
 
 function renderBreakdown(metrics) {
-  const electricityChargeFee = metrics.electricDistanceKm > 0 ? state.settings.chargingFee : 0;
+  const chargingSurchargeDescription =
+    state.settings.chargingFee > 0
+      ? `vast laadtarief ${formatCurrency(metrics.chargingSurcharge)}`
+      : `${formatNumber(state.settings.chargingFeePercentage, 2)}% laadkosten over ${formatCurrency(metrics.baseElectricityCost)} = ${formatCurrency(metrics.chargingSurcharge)}`;
   const items = [
     {
       title: "Elektrische afstand",
@@ -209,7 +241,7 @@ function renderBreakdown(metrics) {
     {
       title: "Elektriciteitskosten",
       value: formatCurrency(metrics.electricityCost),
-      note: `${formatNumber(metrics.electricityUsedKwh, 2)} kWh × ${formatCurrency(state.settings.pricePerKwh)} + instaptarief ${formatCurrency(electricityChargeFee)} = ${formatCurrency(metrics.electricityCost)}.`,
+      note: `${formatNumber(metrics.electricityUsedKwh, 2)} kWh × ${formatCurrency(state.settings.pricePerKwh)} = ${formatCurrency(metrics.baseElectricityCost)} + ${chargingSurchargeDescription} = ${formatCurrency(metrics.electricityCost)}.`,
       dividerAfter: true
     },
     {

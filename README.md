@@ -7,6 +7,7 @@ Een eenvoudige webapp om de elektriciteits- en benzinekosten van een rit met een
 - Berekent automatisch welk deel van een rit elektrisch en op benzine wordt afgelegd.
 - Toont verbruik, accubereik en totale ritkosten.
 - Vergelijkt de kosten per kilometer voor elektrisch rijden en rijden op benzine.
+- Ondersteunt óf een vast laadtarief óf een procentuele opslag over de elektriciteitskosten.
 - Laat de volledige kostenopbouw en tussenberekeningen zien.
 - Bewaart instellingen lokaal in een JSON-bestand.
 - Werkt zonder database of externe Node.js-pakketten.
@@ -42,9 +43,10 @@ PORT=8080 OPEN_BROWSER=0 npm start
 
 1. Vul de elektriciteitsprijs, benzineprijs en verbruikswaarden in.
 2. Vul de gewenste ritafstand en accucapaciteit in.
-3. Bekijk de resultaten en transparante kostenopbouw; deze worden direct bijgewerkt.
-4. Klik op `Opslaan` om de waarden lokaal te bewaren.
-5. Klik op `Terug` om niet-opgeslagen wijzigingen te verwijderen en de laatst opgeslagen waarden te herstellen.
+3. Vul desgewenst een vast laadtarief of een percentage laadkosten in; het andere tarief wordt automatisch op nul gezet.
+4. Bekijk de resultaten en transparante kostenopbouw; deze worden direct bijgewerkt.
+5. Klik op `Opslaan` om de waarden lokaal te bewaren.
+6. Klik op `Terug` om niet-opgeslagen wijzigingen te verwijderen en de laatst opgeslagen waarden te herstellen.
 
 De server maakt `data/settings.json` automatisch aan. Dit bestand bevat lokale gebruikersinstellingen en wordt niet in Git opgenomen.
 
